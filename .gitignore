@@ -1,0 +1,23 @@
+# Visual Studio / .NET derleme çıktıları
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.suo
+*.userprefs
+*.cache
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ll]og/
+TestResults/
+packages/
+*.nupkg
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# Uygulamanın çalışma zamanında ürettiği dosyalar
+highscore.txt
