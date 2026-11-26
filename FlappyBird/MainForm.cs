@@ -1,4 +1,5 @@
 using FlappyBird.Game;
+using FlappyBird.Services;
 
 namespace FlappyBird;
 
@@ -12,7 +13,8 @@ public class MainForm : Form
     private const int GameHeight = 640;
 
     private readonly System.Windows.Forms.Timer _gameTimer = new() { Interval = 16 }; // ~60 FPS
-    private readonly GameEngine _engine = new(GameWidth, GameHeight);
+    private readonly HighScoreStore _highScoreStore = new();
+    private readonly GameEngine _engine;
 
     private readonly Label _lblScore = new();
     private readonly Button _btnNewGame = new();
@@ -28,6 +30,7 @@ public class MainForm : Form
         BackColor = Color.SkyBlue;
         KeyPreview = true;
 
+        _engine = new GameEngine(GameWidth, GameHeight, _highScoreStore.Load());
         InitializeControls();
 
         _engine.ScoreChanged += (_, _) => UpdateScoreLabel();
@@ -68,11 +71,19 @@ public class MainForm : Form
         Invalidate();
     }
 
-    private void UpdateScoreLabel() => _lblScore.Text = $"Skor: {_engine.Score}";
+    private void UpdateScoreLabel() =>
+        _lblScore.Text = $"Skor: {_engine.Score}   Rekor: {_engine.HighScore}   Seviye: {_engine.Level}";
 
     private void Engine_GameEnded(object? sender, EventArgs e)
     {
         _btnNewGame.Visible = true;
+        UpdateScoreLabel();
+
+        if (_engine.IsNewHighScore && !_highScoreStore.Save(_engine.HighScore))
+        {
+            MessageBox.Show("Rekor dosyaya kaydedilemedi.", "Uyarı",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
     }
 
     private void GameTimer_Tick(object? sender, EventArgs e)
@@ -107,7 +118,12 @@ public class MainForm : Form
         if (_engine.State == GameState.Ready)
             DrawCenteredText(g, "Başlamak için SPACE", "Zıplamak: SPACE / ↑");
         else if (_engine.State == GameState.GameOver)
-            DrawCenteredText(g, "GAME OVER", $"Skor: {_engine.Score}   (R: yeniden başlat)");
+        {
+            string sub = _engine.IsNewHighScore
+                ? $"YENİ REKOR: {_engine.Score}!   (R: yeniden başlat)"
+                : $"Skor: {_engine.Score}   (R: yeniden başlat)";
+            DrawCenteredText(g, "GAME OVER", sub);
+        }
     }
 
     private void DrawCenteredText(Graphics g, string title, string subtitle)
