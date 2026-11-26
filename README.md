@@ -79,4 +79,4 @@ FlappyBird/
 ## Öğrenci
 
 - **Ad Soyad:** Halenaz Sarı
-- **Öğrenci No:** _(buraya öğrenci numaranızı yazın)_
+- **Öğrenci No:** _240541008_
